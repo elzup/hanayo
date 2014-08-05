@@ -5,7 +5,7 @@ $consumer_secret = $api_keybox->twitter_consumer_key_secret;
 $access_token = $api_keybox->twitter_access_token;
 $access_token_secret = $api_keybox->twitter_access_token_secret;
 
-require_once('./twitteroauth.php');
+require_once('./twitteroauth/twitteroauth.php');
 $connection = new TwitterOAuth($consumer_key, $consumer_secret, $access_token, $access_token_secret);
 
 require_once('./hanayo_config.php');
