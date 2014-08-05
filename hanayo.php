@@ -1,4 +1,9 @@
 <?php
+//自分はapikey格納用クラスを生成していますが、適当に取得したapikeyを突っ込むのが楽だと思います
+//$consumer_key = "";
+//$consumer_secret = ""; 
+//$access_token = "";
+//$access_token_secret = "";
 require_once('../dbp/api_keybox.php');
 $consumer_key = $api_keybox->twitter_consumer_key;
 $consumer_secret = $api_keybox->twitter_consumer_key_secret;
