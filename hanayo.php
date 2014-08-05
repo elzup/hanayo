@@ -56,8 +56,6 @@ while (1){
 			'POST',
 			array("status"=>$tweet_word)
 		);
-		echo "tweet" . PHP_EOL;
-		exit;	
 		}elseif($per_minutes >= $config['better']['score']){ 
 		$tweet_word = $per_minutes_word . $config['better']['message']; 	
 		$hanayo_review = $connection->OAuthRequest(
@@ -65,8 +63,6 @@ while (1){
 			'POST',
 			array("status"=>$tweet_word)
 		);
-		echo "tweet" . PHP_EOL;
-		exit;	
 		}elseif($per_minutes >= $config['worse']['score']){
 		$tweet_word = $per_minutes_word . $config['worse']['message'];        	
 		$hanayo_review = $connection->OAuthRequest(
@@ -74,8 +70,6 @@ while (1){
 			'POST',
 			array("status"=>$tweet_word)
 		);
-		echo "tweet" . PHP_EOL;
-		exit;	
 		}else{
                 $tweet_word = $per_minutes_word . $config['worst']['message']; 
 		$hanayo_review = $connection->OAuthRequest(
@@ -83,9 +77,9 @@ while (1){
 			'POST',
 			array("status"=>$tweet_word)
 		);
-		echo "tweet" . PHP_EOL;
-		exit;
-		}	
+		}
+		echo "tweet end...";	
+		exit;	
 
 	}
 }
