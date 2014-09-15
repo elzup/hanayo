@@ -4,21 +4,26 @@
 //$consumer_secret = ""; 
 //$access_token = "";
 //$access_token_secret = "";
-require_once('../dbp/api_keybox.php');
+// 外部ファイル読み込み
+require_once('./keys.php');
+require_once('./twitteroauth/twitteroauth.php');
+require_once('./hanayo_config.php');
+//timezoneの設定
+date_default_timezone_set('Asia/Tokyo');
 $consumer_key = $api_keybox->twitter_consumer_key;
 $consumer_secret = $api_keybox->twitter_consumer_key_secret;
 $access_token = $api_keybox->twitter_access_token;
 $access_token_secret = $api_keybox->twitter_access_token_secret;
 
-require_once('./twitteroauth/twitteroauth.php');
 $connection = new TwitterOAuth($consumer_key, $consumer_secret, $access_token, $access_token_secret);
 
-require_once('./hanayo_config.php');
+echo <<<EOF
+Welcome to hanayo.php!!
+this  program looks for rice for HANAYO
 
-echo "Welcome to hanayo.php!!" . PHP_EOL
-	. "this  program looks for rice for HANAYO" . PHP_EOL
-	. PHP_EOL
-	. "Press ENTER KEY" . PHP_EOL;
+Press ENTER KEY
+EOF;
+
 while (1){
 	//入力待ち
 	$standby = trim(fgets(STDIN));
@@ -26,24 +31,21 @@ while (1){
 	case "":
 		//検索単語 取得件数 言語を配列に
 		$search_options = array(
-			'q'=>"$search_word",
-			'count'=>100,
-			'lang'=>'ja'
+			'q' => $search_word,
+			'count' => 100,
+			'lang' => 'ja',
 		);
 		//search api
-		$search_obj = $connection->OAuthRequest(
-			'https://api.twitter.com/1.1/search/tweets.json',
-			'GET',
+		$search_obj = $connection->get(
+			'search/tweets',
 			$search_options
 		);
-		//jsonをdecode
-		$decode_obj = json_decode($search_obj, true);
+		//jsonをdecode はすでにされている stdclassから連想配列に変換
+		$decode_obj = json_decode(json_encode($search_obj), true);
 		//UTF-8 -> SJIS Mac,Linux環境ならコメントアウト推奨
 		mb_convert_variables('sjis', 'utf-8', $decode_obj);
 		//検索結果の件数をcount
 		$result_number = count($decode_obj['statuses']);
-		//timezoneの設定
-		date_default_timezone_set('Asia/Tokyo');
 		//検索結果の中で一番投稿時間の遅いものを取得
 		$last_time = $decode_obj['statuses'][$result_number - 1]['created_at'];
 		//タイムスタンプ変換(seconds)
@@ -54,38 +56,17 @@ while (1){
 		$per_minutes_word = mb_convert_encoding("現在 $per_minutes [okome/min]",'utf-8', 'sjis'); 
 
 		//かよちんにごはんをあげよう
-		if($per_minutes >= $config['best']['score']){
-			$tweet_word = $per_minutes_word . $config['best']['message'];
-			$hanayo_review = $connection->OAuthRequest(
-				'https://api.twitter.com/1.1/statuses/update.json',
-				'POST',
-				array("status"=>$tweet_word)
-			);
-		}elseif($per_minutes >= $config['better']['score']){ 
-			$tweet_word = $per_minutes_word . $config['better']['message']; 	
-			$hanayo_review = $connection->OAuthRequest(
-				'https://api.twitter.com/1.1/statuses/update.json',
-				'POST',
-				array("status"=>$tweet_word)
-			);
-		}elseif($per_minutes >= $config['worse']['score']){
-			$tweet_word = $per_minutes_word . $config['worse']['message'];        	
-			$hanayo_review = $connection->OAuthRequest(
-				'https://api.twitter.com/1.1/statuses/update.json',
-				'POST',
-				array("status"=>$tweet_word)
-			);
-		}else{
-			$tweet_word = $per_minutes_word . $config['worst']['message']; 
-			$hanayo_review = $connection->OAuthRequest(
-				'https://api.twitter.com/1.1/statuses/update.json',
-				'POST',
-				array("status"=>$tweet_word)
-			);
-		}
+        foreach ($config as $rank => $value) {
+            if ($per_minutes >= $value['score'] || $rank == 'worst') {
+                $tweet_word = $per_minutes_word . $value['message'];
+                break;
+            }
+        }
+        $hanayo_review = $connection->post(
+            'statuses/update',
+            array("status" => $tweet_word)
+        );
 		echo "tweet end...";	
 		exit;	
-
 	}
 }
-                                                 
