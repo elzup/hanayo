@@ -1,14 +1,14 @@
 <?php
-//Ž©•ª‚ÍapikeyŠi”[—pƒNƒ‰ƒX‚ð¶¬‚µ‚Ä‚¢‚Ü‚·‚ªA“K“–‚ÉŽæ“¾‚µ‚½apikey‚ð“Ë‚Áž‚Þ‚Ì‚ªŠy‚¾‚ÆŽv‚¢‚Ü‚·
+//è‡ªåˆ†ã¯apikeyæ ¼ç´ç”¨ã‚¯ãƒ©ã‚¹ã‚’ç”Ÿæˆã—ã¦ã„ã¾ã™ãŒã€é©å½“ã«å–å¾—ã—ãŸapikeyã‚’çªã£è¾¼ã‚€ã®ãŒæ¥½ã ã¨æ€ã„ã¾ã™
 //$consumer_key = "";
 //$consumer_secret = ""; 
 //$access_token = "";
 //$access_token_secret = "";
-// ŠO•”ƒtƒ@ƒCƒ‹“Ç‚Ýž‚Ý
+// å¤–éƒ¨ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
 require_once('./keys.php');
 require_once('./twitteroauth/twitteroauth.php');
 require_once('./hanayo_config.php');
-//timezone‚ÌÝ’è
+//timezoneã®è¨­å®š
 date_default_timezone_set('Asia/Tokyo');
 $consumer_key = $api_keybox->twitter_consumer_key;
 $consumer_secret = $api_keybox->twitter_consumer_key_secret;
@@ -25,11 +25,11 @@ Press ENTER KEY
 EOF;
 
 while (1){
-	//“ü—Í‘Ò‚¿
+	//å…¥åŠ›å¾…ã¡
 	$standby = trim(fgets(STDIN));
 	switch($standby){
 	case "":
-		//ŒŸõ’PŒê Žæ“¾Œ” Œ¾Œê‚ð”z—ñ‚É
+		//æ¤œç´¢å˜èªž å–å¾—ä»¶æ•° è¨€èªžã‚’é…åˆ—ã«
 		$search_options = array(
 			'q' => $search_word,
 			'count' => 100,
@@ -40,22 +40,22 @@ while (1){
 			'search/tweets',
 			$search_options
 		);
-		//json‚ðdecode ‚Í‚·‚Å‚É‚³‚ê‚Ä‚¢‚é stdclass‚©‚ç˜A‘z”z—ñ‚É•ÏŠ·
+		//jsonã‚’decode ã¯ã™ã§ã«ã•ã‚Œã¦ã„ã‚‹ stdclassã‹ã‚‰é€£æƒ³é…åˆ—ã«å¤‰æ›
 		$decode_obj = json_decode(json_encode($search_obj), true);
-		//UTF-8 -> SJIS Mac,LinuxŠÂ‹«‚È‚çƒRƒƒ“ƒgƒAƒEƒg„§
+		//UTF-8 -> SJIS Mac,Linuxç’°å¢ƒãªã‚‰ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆæŽ¨å¥¨
 		mb_convert_variables('sjis', 'utf-8', $decode_obj);
-		//ŒŸõŒ‹‰Ê‚ÌŒ”‚ðcount
+		//æ¤œç´¢çµæžœã®ä»¶æ•°ã‚’count
 		$result_number = count($decode_obj['statuses']);
-		//ŒŸõŒ‹‰Ê‚Ì’†‚Åˆê”Ô“ŠeŽžŠÔ‚Ì’x‚¢‚à‚Ì‚ðŽæ“¾
+		//æ¤œç´¢çµæžœã®ä¸­ã§ä¸€ç•ªæŠ•ç¨¿æ™‚é–“ã®é…ã„ã‚‚ã®ã‚’å–å¾—
 		$last_time = $decode_obj['statuses'][$result_number - 1]['created_at'];
-		//ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv•ÏŠ·(seconds)
+		//ã‚¿ã‚¤ãƒ ã‚¹ã‚¿ãƒ³ãƒ—å¤‰æ›(seconds)
 		$timestamp_last = strtotime($last_time);
-		//‚¨‚±‚ß per minutes
+		//ãŠã“ã‚ per minutes
 		$per_minutes = $result_number * 60 / (time() - $timestamp_last);
-		//‚¨‚±‚ß per minutes“Še—pƒ[ƒh
-		$per_minutes_word = mb_convert_encoding("Œ»Ý $per_minutes [okome/min]",'utf-8', 'sjis'); 
+		//ãŠã“ã‚ per minutesæŠ•ç¨¿ç”¨ãƒ¯ãƒ¼ãƒ‰
+		$per_minutes_word = mb_convert_encoding("ç¾åœ¨ $per_minutes [okome/min]",'utf-8', 'sjis'); 
 
-		//‚©‚æ‚¿‚ñ‚É‚²‚Í‚ñ‚ð‚ ‚°‚æ‚¤
+		//ã‹ã‚ˆã¡ã‚“ã«ã”ã¯ã‚“ã‚’ã‚ã’ã‚ˆã†
         foreach ($config as $rank => $value) {
             if ($per_minutes >= $value['score'] || $rank == 'worst') {
                 $tweet_word = $per_minutes_word . $value['message'];
